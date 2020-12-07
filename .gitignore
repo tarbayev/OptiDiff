@@ -1,0 +1,13 @@
+.DS_Store
+.build
+/Packages
+xcuserdata/
+
+# Ignoring Pods directory except the performance baselines
+!Example/Pods/
+Example/Pods/*
+!Example/Pods/Pods.xcodeproj/
+Example/Pods/Pods.xcodeproj/*
+!Example/Pods/Pods.xcodeproj/xcshareddata/
+Example/Pods/Pods.xcodeproj/xcshareddata/*
+!Example/Pods/Pods.xcodeproj/xcshareddata/xcbaselines/

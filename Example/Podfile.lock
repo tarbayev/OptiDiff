@@ -1,0 +1,28 @@
+PODS:
+  - OptiDiff (0.1.0):
+    - OptiDiff/Diff (= 0.1.0)
+    - OptiDiff/UI (= 0.1.0)
+  - OptiDiff/Diff (0.1.0)
+  - OptiDiff/ExampleApp (0.1.0)
+  - OptiDiff/Tests (0.1.0)
+  - OptiDiff/UI (0.1.0):
+    - OptiDiff/Diff
+  - OptiDiff/UITests (0.1.0):
+    - OptiDiff/ExampleApp
+
+DEPENDENCIES:
+  - OptiDiff (from `../`)
+  - OptiDiff/ExampleApp (from `../`)
+  - OptiDiff/Tests (from `../`)
+  - OptiDiff/UITests (from `../`)
+
+EXTERNAL SOURCES:
+  OptiDiff:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  OptiDiff: fe09a4897a6d4dd292a09e0e41ee60b341e6a620
+
+PODFILE CHECKSUM: 89aa83868632137122bfade030b41cd518bec932
+
+COCOAPODS: 1.8.4

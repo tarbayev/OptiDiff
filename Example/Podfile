@@ -1,0 +1,6 @@
+use_frameworks!
+workspace 'OptiDiff.xcworkspace'
+
+platform :ios, '11.0'
+
+pod 'OptiDiff', :path => '../', :testspecs => ['Tests', 'UITests' ], :appspecs => ['ExampleApp']
