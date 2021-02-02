@@ -1,15 +1,15 @@
 import UIKit
 
 public struct TableViewAnimations {
-  typealias Animation = UITableView.RowAnimation
+  public typealias Animation = UITableView.RowAnimation
 
-  var sectionDelete = Animation.automatic
-  var sectionInsert = Animation.automatic
-  var sectionReload = Animation.automatic
+  public var sectionDelete = Animation.automatic
+  public var sectionInsert = Animation.automatic
+  public var sectionReload = Animation.automatic
 
-  var rowDelete = Animation.automatic
-  var rowInsert = Animation.automatic
-  var rowReload = Animation.automatic
+  public var rowDelete = Animation.automatic
+  public var rowInsert = Animation.automatic
+  public var rowReload = Animation.automatic
 }
 
 public extension TableViewAnimations {
