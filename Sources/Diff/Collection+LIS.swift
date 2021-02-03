@@ -19,27 +19,29 @@ public extension Collection where Index == Int, Element: Comparable {
     let previousIndexes = UnsafeMutableBufferPointer<Int>.allocate(capacity: count)
     let lengthIndexes = UnsafeMutableBufferPointer<Int>.allocate(capacity: count + 1)
 
+    defer {
+      previousIndexes.deallocate()
+      lengthIndexes.deallocate()
+    }
+
     previousIndexes[0] = lengthIndexes[0]
     lengthIndexes[1] = 0
     var length = 1
 
     for i in length..<count {
-//      if let next = nextRequiredIndex, self[i] > self[next] {
-//        continue
-//      }
-
-      if let prev = prevRequiredIndex, self[i] < self[prev] {
+      let value = self[i]
+      if let prev = prevRequiredIndex, value < self[prev] {
         continue
       }
 
       var lo = 1
-      if self[lengthIndexes[length]] < self[i] {
+      if self[lengthIndexes[length]] < value {
         lo = length + 1
       } else {
         var hi = length - 1
         while lo <= hi {
           let mid = lo + (hi - lo) / 2
-          if self[lengthIndexes[mid]] < self[i] {
+          if self[lengthIndexes[mid]] < value {
             lo = mid + 1
           } else {
             hi = mid - 1
@@ -67,9 +69,6 @@ public extension Collection where Index == Int, Element: Comparable {
       result.insert(index)
       index = previousIndexes[index]
     }
-
-    previousIndexes.deallocate()
-    lengthIndexes.deallocate()
 
     return result
   }

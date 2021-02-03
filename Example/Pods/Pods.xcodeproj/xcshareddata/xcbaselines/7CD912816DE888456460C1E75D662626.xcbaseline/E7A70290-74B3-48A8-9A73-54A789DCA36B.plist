@@ -11,9 +11,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.68223</real>
+					<real>0.68105</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>3. Feb 2021 at 21:02:56</string>
+					<string>3. Feb 2021 at 21:14:52</string>
 				</dict>
 			</dict>
 			<key>test_performance_unchangedNonRepeatingElements()</key>
@@ -21,9 +21,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.68127</real>
+					<real>0.6753</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>3. Feb 2021 at 21:02:56</string>
+					<string>3. Feb 2021 at 21:14:52</string>
 				</dict>
 			</dict>
 			<key>test_performance_unchangedRepeatingElements()</key>
@@ -31,9 +31,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.61081</real>
+					<real>0.61042</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>3. Feb 2021 at 21:02:56</string>
+					<string>3. Feb 2021 at 21:14:52</string>
 				</dict>
 			</dict>
 		</dict>
@@ -44,9 +44,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.50867</real>
+					<real>0.17746</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>1. Feb 2021 at 20:51:41</string>
+					<string>3. Feb 2021 at 21:14:52</string>
 				</dict>
 			</dict>
 			<key>test_performance_increasingSequence()</key>
@@ -54,9 +54,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.60179</real>
+					<real>0.12419</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>1. Feb 2021 at 20:51:41</string>
+					<string>3. Feb 2021 at 21:14:52</string>
 				</dict>
 			</dict>
 			<key>test_performance_sameElements()</key>
@@ -64,9 +64,9 @@
 				<key>com.apple.XCTPerformanceMetric_WallClockTime</key>
 				<dict>
 					<key>baselineAverage</key>
-					<real>0.38281</real>
+					<real>0.11807</real>
 					<key>baselineIntegrationDisplayName</key>
-					<string>1. Feb 2021 at 20:51:41</string>
+					<string>3. Feb 2021 at 21:14:52</string>
 				</dict>
 			</dict>
 		</dict>
