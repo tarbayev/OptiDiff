@@ -29,14 +29,14 @@ public extension Collection where Index == Int {
 
     typealias Move = CollectionDiff<IndexSet>.Move
     var allMoves: [Move] = []
-    var unchangedIndexes = IndexSet()
+    var unchangedIndexes: [Int] = []
 
     for index in indices {
       let key = identifier(self[index])
       if let oldIndex = oldIndexes[key]?.popLast() {
         allMoves.append(Move(from: oldIndex, to: index))
         if oldIndex == index {
-          unchangedIndexes.insert(index)
+          unchangedIndexes.append(allMoves.count - 1)
         }
         if !areEqualAt(oldIndex, index) {
           updates.insert(index)
@@ -47,19 +47,8 @@ public extension Collection where Index == Int {
       }
     }
 
-    let naturalMoveIndexes = allMoves
-      .longestIncreasingSubsequenceIndexes(
-        comparedBy: \.from,
-        skipWhere: { move in
-          if let nextUnchanged = unchangedIndexes.integerGreaterThan(move.to), move.from > nextUnchanged {
-            return true
-          }
-          if let prevUnchanged = unchangedIndexes.integerLessThan(move.to), move.from < prevUnchanged {
-            return true
-          }
-          return false
-        }
-      )
+    let naturalMoveIndexes = allMoves.map(\.from)
+      .longestIncreasingSubsequenceIndexes(including: unchangedIndexes)
 
     let allMoveIndexes = IndexSet(integersIn: 0..<allMoves.count)
     let actualMoveIndexes = allMoveIndexes.subtracting(naturalMoveIndexes)
