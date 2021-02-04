@@ -1,35 +1,47 @@
 import Foundation
 
-public extension Collection where Index == Int {
-  func longestIncreasingSubsequenceIndexes(areInIncreasingOrder: (Element, Element) -> Bool,
-                                           skipWhere shouldSkip: (Element) -> Bool) -> IndexSet {
-    var length = 0
+public extension Collection where Index == Int, Element: Comparable {
+  func longestIncreasingSubsequenceIndexes(including requiredIndexes: [Int]) -> IndexSet {
+    if isEmpty {
+      return IndexSet()
+    }
+
+    var requiredIndexIterator = requiredIndexes.makeIterator()
+
+    var nextRequiredIndex = requiredIndexIterator.next()
+    var prevRequiredIndex: Int?
+
+    if nextRequiredIndex == 0 {
+      nextRequiredIndex = requiredIndexIterator.next()
+      prevRequiredIndex = 0
+    }
 
     let previousIndexes = UnsafeMutableBufferPointer<Int>.allocate(capacity: count)
     let lengthIndexes = UnsafeMutableBufferPointer<Int>.allocate(capacity: count + 1)
 
-    if count > 0 {
-      previousIndexes[0] = lengthIndexes[0]
-      lengthIndexes[1] = 0
-      length = 1
+    defer {
+      previousIndexes.deallocate()
+      lengthIndexes.deallocate()
     }
 
-    let start = length
+    previousIndexes[0] = lengthIndexes[0]
+    lengthIndexes[1] = 0
+    var length = 1
 
-    for i in start..<count {
-
-      if shouldSkip(self[i]) {
+    for i in length..<count {
+      let value = self[i]
+      if let prev = prevRequiredIndex, value < self[prev] {
         continue
       }
 
       var lo = 1
-      if areInIncreasingOrder(self[lengthIndexes[length]], self[i]) {
+      if self[lengthIndexes[length]] < value {
         lo = length + 1
       } else {
         var hi = length - 1
         while lo <= hi {
           let mid = lo + (hi - lo) / 2
-          if areInIncreasingOrder(self[lengthIndexes[mid]], self[i]) {
+          if self[lengthIndexes[mid]] < value {
             lo = mid + 1
           } else {
             hi = mid - 1
@@ -38,11 +50,14 @@ public extension Collection where Index == Int {
       }
 
       let newLength = lo
-
       previousIndexes[i] = lengthIndexes[newLength - 1]
       lengthIndexes[newLength] = i
 
-      if newLength > length {
+      if i == nextRequiredIndex {
+        length = newLength
+        prevRequiredIndex = nextRequiredIndex
+        nextRequiredIndex = requiredIndexIterator.next()
+      } else if newLength > length {
         length = newLength
       }
     }
@@ -55,23 +70,6 @@ public extension Collection where Index == Int {
       index = previousIndexes[index]
     }
 
-    previousIndexes.deallocate()
-    lengthIndexes.deallocate()
-
     return result
-  }
-
-  func longestIncreasingSubsequenceIndexes<T: Comparable>(comparedBy comparedValue: (Element) -> T,
-                                                          skipWhere shouldSkip: (Element) -> Bool) -> IndexSet {
-    longestIncreasingSubsequenceIndexes(
-      areInIncreasingOrder: { comparedValue($0) < comparedValue($1) },
-      skipWhere: shouldSkip
-    )
-  }
-}
-
-public extension Collection where Index == Int, Element: Comparable {
-  func longestIncreasingSubsequenceIndexes(skipWhere shouldSkip: (Element) -> Bool = { _ in false }) -> IndexSet {
-    longestIncreasingSubsequenceIndexes(areInIncreasingOrder: <, skipWhere: shouldSkip)
   }
 }

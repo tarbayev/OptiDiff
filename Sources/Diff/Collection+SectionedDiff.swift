@@ -16,32 +16,32 @@ public extension Collection where Index == Int {
     var childUpdatesBefore: [IndexPath] = []
     var childUpdatesAfter: [IndexPath] = []
 
-    let diff: CollectionDiff<IndexSet> = difference(from: old, identifiedBy: identifier) { (oldIndex: Int, newIndex: Int) in
-      let oldElement = old[oldIndex]
-      let newElement = self[newIndex]
+    let rawDiff: CollectionDiff<IndexSet> = rawDifference(from: old, identifiedBy: identifier, areEqual: areEqual)
+
+    for move in rawDiff.moves {
+      let oldElement = old[move.from]
+      let newElement = self[move.to]
       let oldItems = items(oldElement)
       let newItems = items(newElement)
       let itemDiff: CollectionDiff<IndexSet> = newItems.difference(from: oldItems, identifiedBy: itemIdentifier, areEqual: areItemsEqual)
 
       for index in itemDiff.removals {
-        removedChildren[itemIdentifier(oldItems[index]), default: []].append(IndexPath(indexes: [oldIndex, index]))
+        removedChildren[itemIdentifier(oldItems[index]), default: []].append(IndexPath(indexes: [move.from, index]))
       }
 
       for index in itemDiff.insertions {
-        insertedChildren[itemIdentifier(newItems[index]), default: []].append(IndexPath(indexes: [newIndex, index]))
+        insertedChildren[itemIdentifier(newItems[index]), default: []].append(IndexPath(indexes: [move.to, index]))
       }
 
       childMoves += itemDiff.moves.map {
         Move(
-          from: IndexPath(indexes: [oldIndex, $0.from]),
-          to: IndexPath(indexes: [newIndex, $0.to])
+          from: IndexPath(indexes: [move.from, $0.from]),
+          to: IndexPath(indexes: [move.to, $0.to])
         )
       }
 
-      childUpdatesBefore += itemDiff.updatesBefore.map { IndexPath(indexes: [oldIndex, $0]) }
-      childUpdatesAfter += itemDiff.updatesAfter.map { IndexPath(indexes: [newIndex, $0]) }
-
-      return areEqual(oldElement, newElement)
+      childUpdatesBefore += itemDiff.updatesBefore.map { IndexPath(indexes: [move.from, $0]) }
+      childUpdatesAfter += itemDiff.updatesAfter.map { IndexPath(indexes: [move.to, $0]) }
     }
 
     var childRemovals: [IndexPath] = []
@@ -69,7 +69,7 @@ public extension Collection where Index == Int {
     }
 
     return SectionedCollectionDiff(
-      section: diff,
+      section: rawDiff.optimizingMoves(),
       item: .init(
         removals: Set(childRemovals),
         insertions: Set(childInsertions),

@@ -1,45 +1,29 @@
 import Foundation
 
 public extension Collection where Index == Int {
-  func difference<H>(from old: Self,
-                     identifiedBy identifier: (Element) -> H,
-                     areEqualAt: (_ oldIndex: Index, _ newIndex: Index) -> Bool) -> CollectionDiff<IndexSet>
+  func rawDifference<H>(from old: Self,
+                        identifiedBy identifier: (Element) -> H,
+                        areEqual: (Element, Element) -> Bool) -> CollectionDiff<IndexSet>
     where H: Hashable {
-    var oldIndexes: [H: [Index]] = old.indices.reversed().reduce(into: [:]) { result, index in
-      result[identifier(old[index]), default: []].append(index)
+    var oldIndexes: [H: [Index]] = old.enumerated().reversed().reduce(into: [:]) { result, entry in
+      result[identifier(entry.element), default: []].append(entry.offset)
     }
 
-    var newIndexCounts: [H: Int] = reduce(into: [:]) { result, element in
-      result[identifier(element), default: 0] += 1
-    }
-
-    var removals = IndexSet()
+    var removals = IndexSet(0..<old.count)
     var insertions = IndexSet()
-    var updates = IndexSet()
+    var updatesAfter = IndexSet()
     var updatesBefore = IndexSet()
-
-    for index in old.indices {
-      let key = identifier(old[index])
-      if let count = newIndexCounts[key], count > 0 {
-        newIndexCounts[key] = count - 1
-      } else {
-        removals.insert(index)
-      }
-    }
 
     typealias Move = CollectionDiff<IndexSet>.Move
     var allMoves: [Move] = []
-    var unchangedIndexes = IndexSet()
 
-    for index in indices {
-      let key = identifier(self[index])
+    for (index, element) in enumerated() {
+      let key = identifier(element)
       if let oldIndex = oldIndexes[key]?.popLast() {
+        removals.remove(oldIndex)
         allMoves.append(Move(from: oldIndex, to: index))
-        if oldIndex == index {
-          unchangedIndexes.insert(index)
-        }
-        if !areEqualAt(oldIndex, index) {
-          updates.insert(index)
+        if !areEqual(old[oldIndex], element) {
+          updatesAfter.insert(index)
           updatesBefore.insert(oldIndex)
         }
       } else {
@@ -47,30 +31,11 @@ public extension Collection where Index == Int {
       }
     }
 
-    let naturalMoveIndexes = allMoves
-      .longestIncreasingSubsequenceIndexes(
-        comparedBy: \.from,
-        skipWhere: { move in
-          if let nextUnchanged = unchangedIndexes.integerGreaterThan(move.to), move.from > nextUnchanged {
-            return true
-          }
-          if let prevUnchanged = unchangedIndexes.integerLessThan(move.to), move.from < prevUnchanged {
-            return true
-          }
-          return false
-        }
-      )
-
-    let allMoveIndexes = IndexSet(integersIn: 0..<allMoves.count)
-    let actualMoveIndexes = allMoveIndexes.subtracting(naturalMoveIndexes)
-
-    let moves = actualMoveIndexes.map { allMoves[$0] }
-
     return CollectionDiff(
       removals: removals,
       insertions: insertions,
-      moves: moves,
-      updatesAfter: updates,
+      moves: allMoves,
+      updatesAfter: updatesAfter,
       updatesBefore: updatesBefore
     )
   }
@@ -79,7 +44,7 @@ public extension Collection where Index == Int {
                      identifiedBy identifier: (Element) -> H,
                      areEqual: (Element, Element) -> Bool) -> CollectionDiff<IndexSet>
     where H: Hashable {
-    difference(from: old, identifiedBy: identifier) { areEqual(old[$0], self[$1]) }
+    rawDifference(from: old, identifiedBy: identifier, areEqual: areEqual).optimizingMoves()
   }
 }
 
