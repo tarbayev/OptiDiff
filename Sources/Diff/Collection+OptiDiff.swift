@@ -1,27 +1,5 @@
 import Foundation
 
-extension CollectionDiff where Indexes == IndexSet {
-  func optimizingMoves() -> Self {
-    let unchangedIndexes = moves.enumerated().compactMap { $0.element.from == $0.element.to ? $0.offset : nil }
-
-    let naturalMoveIndexes = moves.map(\.from)
-      .longestIncreasingSubsequenceIndexes(including: unchangedIndexes)
-
-    let allMoveIndexes = IndexSet(integersIn: 0..<moves.count)
-    let actualMoveIndexes = allMoveIndexes.subtracting(naturalMoveIndexes)
-
-    let optimalMoves = actualMoveIndexes.map { moves[$0] }
-
-    return CollectionDiff(
-      removals: removals,
-      insertions: insertions,
-      moves: optimalMoves,
-      updatesAfter: updatesAfter,
-      updatesBefore: updatesBefore
-    )
-  }
-}
-
 public extension Collection where Index == Int {
   func rawDifference<H>(from old: Self,
                      identifiedBy identifier: (Element) -> H,
