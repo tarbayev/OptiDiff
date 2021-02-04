@@ -25,7 +25,7 @@ extension CollectionDiff where Indexes == IndexSet {
 public extension Collection where Index == Int {
   func rawDifference<H>(from old: Self,
                      identifiedBy identifier: (Element) -> H,
-                     areEqualAt: (_ oldIndex: Index, _ newIndex: Index) -> Bool) -> CollectionDiff<IndexSet>
+                     areEqual: (Element, Element) -> Bool) -> CollectionDiff<IndexSet>
     where H: Hashable {
     var oldIndexes: [H: [Index]] = old.enumerated().reversed().reduce(into: [:]) { result, entry in
       result[identifier(entry.element), default: []].append(entry.offset)
@@ -44,7 +44,7 @@ public extension Collection where Index == Int {
       if let oldIndex = oldIndexes[key]?.popLast() {
         removals.remove(oldIndex)
         allMoves.append(Move(from: oldIndex, to: index))
-        if !areEqualAt(oldIndex, index) {
+        if !areEqual(old[oldIndex], element) {
           updatesAfter.insert(index)
           updatesBefore.insert(oldIndex)
         }
@@ -64,16 +64,9 @@ public extension Collection where Index == Int {
 
   func difference<H>(from old: Self,
                      identifiedBy identifier: (Element) -> H,
-                     areEqualAt: (_ oldIndex: Index, _ newIndex: Index) -> Bool) -> CollectionDiff<IndexSet>
-    where H: Hashable {
-    rawDifference(from: old, identifiedBy: identifier, areEqualAt: areEqualAt).optimizingMoves()
-  }
-
-  func difference<H>(from old: Self,
-                     identifiedBy identifier: (Element) -> H,
                      areEqual: (Element, Element) -> Bool) -> CollectionDiff<IndexSet>
     where H: Hashable {
-    difference(from: old, identifiedBy: identifier) { areEqual(old[$0], self[$1]) }
+    rawDifference(from: old, identifiedBy: identifier, areEqual: areEqual).optimizingMoves()
   }
 }
 
