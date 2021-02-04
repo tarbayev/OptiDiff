@@ -5,8 +5,8 @@ public extension Collection where Index == Int {
                      identifiedBy identifier: (Element) -> H,
                      areEqualAt: (_ oldIndex: Index, _ newIndex: Index) -> Bool) -> CollectionDiff<IndexSet>
     where H: Hashable {
-    var oldIndexes: [H: [Index]] = old.indices.reversed().reduce(into: [:]) { result, index in
-      result[identifier(old[index]), default: []].append(index)
+    var oldIndexes: [H: [Index]] = old.enumerated().reversed().reduce(into: [:]) { result, entry in
+      result[identifier(entry.element), default: []].append(entry.offset)
     }
 
     var newIndexCounts: [H: Int] = reduce(into: [:]) { result, element in
@@ -18,8 +18,8 @@ public extension Collection where Index == Int {
     var updates = IndexSet()
     var updatesBefore = IndexSet()
 
-    for index in old.indices {
-      let key = identifier(old[index])
+    for (index, element) in old.enumerated() {
+      let key = identifier(element)
       if let count = newIndexCounts[key], count > 0 {
         newIndexCounts[key] = count - 1
       } else {
@@ -31,8 +31,8 @@ public extension Collection where Index == Int {
     var allMoves: [Move] = []
     var unchangedIndexes: [Int] = []
 
-    for index in indices {
-      let key = identifier(self[index])
+    for (index, element) in enumerated() {
+      let key = identifier(element)
       if let oldIndex = oldIndexes[key]?.popLast() {
         allMoves.append(Move(from: oldIndex, to: index))
         if oldIndex == index {
