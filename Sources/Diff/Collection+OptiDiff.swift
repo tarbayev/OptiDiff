@@ -1,7 +1,29 @@
 import Foundation
 
+extension CollectionDiff where Indexes == IndexSet {
+  func optimizingMoves() -> Self {
+    let unchangedIndexes = moves.enumerated().compactMap { $0.element.from == $0.element.to ? $0.offset : nil }
+
+    let naturalMoveIndexes = moves.map(\.from)
+      .longestIncreasingSubsequenceIndexes(including: unchangedIndexes)
+
+    let allMoveIndexes = IndexSet(integersIn: 0..<moves.count)
+    let actualMoveIndexes = allMoveIndexes.subtracting(naturalMoveIndexes)
+
+    let optimalMoves = actualMoveIndexes.map { moves[$0] }
+
+    return CollectionDiff(
+      removals: removals,
+      insertions: insertions,
+      moves: optimalMoves,
+      updatesAfter: updatesAfter,
+      updatesBefore: updatesBefore
+    )
+  }
+}
+
 public extension Collection where Index == Int {
-  func difference<H>(from old: Self,
+  func rawDifference<H>(from old: Self,
                      identifiedBy identifier: (Element) -> H,
                      areEqualAt: (_ oldIndex: Index, _ newIndex: Index) -> Bool) -> CollectionDiff<IndexSet>
     where H: Hashable {
@@ -11,23 +33,19 @@ public extension Collection where Index == Int {
 
     var removals = IndexSet(0..<old.count)
     var insertions = IndexSet()
-    var updates = IndexSet()
+    var updatesAfter = IndexSet()
     var updatesBefore = IndexSet()
 
     typealias Move = CollectionDiff<IndexSet>.Move
     var allMoves: [Move] = []
-    var unchangedIndexes: [Int] = []
 
     for (index, element) in enumerated() {
       let key = identifier(element)
       if let oldIndex = oldIndexes[key]?.popLast() {
         removals.remove(oldIndex)
         allMoves.append(Move(from: oldIndex, to: index))
-        if oldIndex == index {
-          unchangedIndexes.append(allMoves.count - 1)
-        }
         if !areEqualAt(oldIndex, index) {
-          updates.insert(index)
+          updatesAfter.insert(index)
           updatesBefore.insert(oldIndex)
         }
       } else {
@@ -35,21 +53,20 @@ public extension Collection where Index == Int {
       }
     }
 
-    let naturalMoveIndexes = allMoves.map(\.from)
-      .longestIncreasingSubsequenceIndexes(including: unchangedIndexes)
-
-    let allMoveIndexes = IndexSet(integersIn: 0..<allMoves.count)
-    let actualMoveIndexes = allMoveIndexes.subtracting(naturalMoveIndexes)
-
-    let moves = actualMoveIndexes.map { allMoves[$0] }
-
     return CollectionDiff(
       removals: removals,
       insertions: insertions,
-      moves: moves,
-      updatesAfter: updates,
+      moves: allMoves,
+      updatesAfter: updatesAfter,
       updatesBefore: updatesBefore
     )
+  }
+
+  func difference<H>(from old: Self,
+                     identifiedBy identifier: (Element) -> H,
+                     areEqualAt: (_ oldIndex: Index, _ newIndex: Index) -> Bool) -> CollectionDiff<IndexSet>
+    where H: Hashable {
+    rawDifference(from: old, identifiedBy: identifier, areEqualAt: areEqualAt).optimizingMoves()
   }
 
   func difference<H>(from old: Self,
