@@ -8,7 +8,7 @@
 
 Pod::Spec.new do |s|
   s.name             = 'OptiDiff'
-  s.version          = '0.1.1'
+  s.version          = '0.2.0'
   s.summary          = 'A library for fast calculating of optimal collection diffs.'
 
   # This description is used to generate tags and improve search results.
