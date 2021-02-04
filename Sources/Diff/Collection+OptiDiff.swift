@@ -9,23 +9,10 @@ public extension Collection where Index == Int {
       result[identifier(entry.element), default: []].append(entry.offset)
     }
 
-    var newIndexCounts: [H: Int] = reduce(into: [:]) { result, element in
-      result[identifier(element), default: 0] += 1
-    }
-
-    var removals = IndexSet()
+    var removals = IndexSet(0..<old.count)
     var insertions = IndexSet()
     var updates = IndexSet()
     var updatesBefore = IndexSet()
-
-    for (index, element) in old.enumerated() {
-      let key = identifier(element)
-      if let count = newIndexCounts[key], count > 0 {
-        newIndexCounts[key] = count - 1
-      } else {
-        removals.insert(index)
-      }
-    }
 
     typealias Move = CollectionDiff<IndexSet>.Move
     var allMoves: [Move] = []
@@ -34,6 +21,7 @@ public extension Collection where Index == Int {
     for (index, element) in enumerated() {
       let key = identifier(element)
       if let oldIndex = oldIndexes[key]?.popLast() {
+        removals.remove(oldIndex)
         allMoves.append(Move(from: oldIndex, to: index))
         if oldIndex == index {
           unchangedIndexes.append(allMoves.count - 1)
