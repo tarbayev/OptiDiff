@@ -1,3 +1,6 @@
+#if SWIFT_PACKAGE
+  import OptiDiff
+#endif
 import UIKit
 
 public struct TableViewAnimations {
