@@ -3,7 +3,7 @@ name: CI
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [ master, dev ]
   pull_request:
     branches: [ master ]
 
@@ -12,17 +12,19 @@ on:
 
 jobs:
   test:
-    runs-on: macos-latest
+    runs-on: macos-13
 
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      - uses: maxim-lobanov/setup-xcode@v1.5.1
+        with:
+          xcode-version: '14.3.1'
 
       - name: Linting
-        run: swift run -c release --package-path SwiftFormatPackage swiftformat --swiftversion 5.3 --lint ../.
+        run: ./swiftformat . --lint
 
       - name: Testing Swift package
-        run: xcodebuild test -scheme OptiDiff
+        run: xcodebuild test -scheme OptiDiff -destination 'platform=iOS Simulator,OS=16,name=iPhone 14'
 
       - name: Linting podspec
         run: |

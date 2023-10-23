@@ -1,12 +1,14 @@
 import Foundation
 
 public extension Collection where Index == Int {
-  func sectionedDifference<ID, Item, CID>(from old: Self,
-                                          identifiedBy identifier: (Element) -> ID,
-                                          areEqual: (Element, Element) -> Bool,
-                                          items: (Element) -> [Item],
-                                          identifiedBy itemIdentifier: (Item) -> CID,
-                                          areEqual areItemsEqual: (Item, Item) -> Bool) -> SectionedCollectionDiff
+  func sectionedDifference<ID, Item, CID>(
+    from old: Self,
+    identifiedBy identifier: (Element) -> ID,
+    areEqual: (Element, Element) -> Bool,
+    items: (Element) -> [Item],
+    identifiedBy itemIdentifier: (Item) -> CID,
+    areEqual areItemsEqual: (Item, Item) -> Bool
+  ) -> SectionedCollectionDiff
     where ID: Hashable, CID: Hashable {
     var removedChildren: [CID: [IndexPath]] = [:]
     var insertedChildren: [CID: [IndexPath]] = [:]
@@ -80,12 +82,14 @@ public extension Collection where Index == Int {
     )
   }
 
-  func sectionedDifference<ID, Item, CID, SectionValue, ItemValue>(from old: Self,
-                                                                   identifiedBy identifier: (Element) -> ID,
-                                                                   areEqualBy sectionValue: (Element) -> SectionValue,
-                                                                   items: (Element) -> [Item],
-                                                                   identifiedBy itemIdentifier: (Item) -> CID,
-                                                                   areEqualBy itemValue: (Item) -> ItemValue) -> SectionedCollectionDiff
+  func sectionedDifference<ID, Item, CID, SectionValue, ItemValue>(
+    from old: Self,
+    identifiedBy identifier: (Element) -> ID,
+    areEqualBy sectionValue: (Element) -> SectionValue,
+    items: (Element) -> [Item],
+    identifiedBy itemIdentifier: (Item) -> CID,
+    areEqualBy itemValue: (Item) -> ItemValue
+  ) -> SectionedCollectionDiff
     where ID: Hashable, CID: Hashable, SectionValue: Equatable, ItemValue: Equatable {
     sectionedDifference(
       from: old,

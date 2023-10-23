@@ -2,6 +2,7 @@
 .build
 /Packages
 xcuserdata/
+.swiftformat-bin
 
 # Ignoring Pods directory except the performance baselines
 !Example/Pods/

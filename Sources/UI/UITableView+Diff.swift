@@ -19,9 +19,11 @@ public extension TableViewAnimations {
 }
 
 public extension UITableView {
-  func performUpdates(with diff: SectionedCollectionDiff,
-                      animations: TableViewAnimations = .automatic(),
-                      completion: @escaping () -> Void) {
+  func performUpdates(
+    with diff: SectionedCollectionDiff,
+    animations: TableViewAnimations = .automatic(),
+    completion: @escaping () -> Void
+  ) {
     guard window != nil else {
       reloadData()
       return
