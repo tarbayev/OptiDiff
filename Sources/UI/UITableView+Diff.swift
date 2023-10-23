@@ -1,4 +1,6 @@
-import OptiDiff
+#if canImport(OptiDiff)
+  import OptiDiff
+#endif
 import UIKit
 
 public struct TableViewAnimations {
