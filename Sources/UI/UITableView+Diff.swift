@@ -1,5 +1,5 @@
 #if SWIFT_PACKAGE
-import OptiDiff
+    import OptiDiff
 #endif
 import UIKit
 
