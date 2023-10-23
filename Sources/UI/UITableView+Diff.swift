@@ -1,4 +1,5 @@
 import UIKit
+import OptiDiff
 
 public struct TableViewAnimations {
   public typealias Animation = UITableView.RowAnimation
